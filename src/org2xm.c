@@ -10,7 +10,8 @@
 * TODO:
 *   -Add option to toggle non-linear volumes and pan
 *
-* Usage: "org2xm input.org ORGxxxyy.DAT"
+* Usage: "org2xm input.org"
+*        "org2xm input.org ORGxxxyy.DAT" to specify .DATfile used (default 210EN)
 *        "org2xm input.org ORGxxxyy.DAT c" for compatibility (but quality is worse)
 *
 * Credits:
@@ -168,7 +169,10 @@ int SBKload(char *path)
     FILE *f;
     uint32_t i, j;
     uint32_t fSize;
-    if (!(f = fopen(path, "rb"))) goto Err10;
+    if (!(f = fopen(path, "rb"))) {
+	    //Opens ORG210EN.DAT if no argument provided
+	    f = fopen("ORG210EN.DAT", "rb");
+    }
 
     //file size, just in case
     fseek(f , 0 , SEEK_END);
@@ -359,14 +363,19 @@ int main(int argc, char** argv)
     int i, j, k, l, m;
     FILE *f, *g;
 
-    if (argc < 3) goto Err1;
+    if (argc < 2) goto Err1;
     if (argc > 3) compatibility = 1;
 
     //Read bank file
     int ret = SBKload(argv[2]);
     if (ret) return ret;
 
-    if (!(f = fopen(argv[1], "rb"))) goto Err2;
+    if (!(f = fopen(argv[1], "rb"))) {
+	    //goto Err2;
+	    //give default string
+	    f = fopen("ORGEN210.DAT", "rb");
+    }
+
 
 
     // Read the Org file
