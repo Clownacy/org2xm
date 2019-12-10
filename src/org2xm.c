@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
-#include <Windows.h>
 
 #define PACKED __attribute__((packed))
 
