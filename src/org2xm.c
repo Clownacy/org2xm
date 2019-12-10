@@ -19,19 +19,12 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 #define PACKED __attribute__((packed))
-
-typedef signed char    S8;
-typedef signed short   S16;
-typedef unsigned char  U8;
-typedef unsigned short U16;
-typedef unsigned int   U32;
-
-
 
 #define read(to, bytes) fread(to, 1, bytes, f)
 #define write(from, bytes) fwrite(from, 1, bytes, g)
@@ -46,22 +39,22 @@ typedef unsigned int   U32;
 #pragma pack(push,1)
 struct OrgHeader
 {
-    U8 magic[6];
-    U16 msPerBeat;  // 1..2000
-    U8 measuresPerBar;
-    U8 beatsPerMeasure;
-    U32 loopStart;  // in beats
-    U32 loopEnd;
+    uint8_t magic[6];
+    uint16_t msPerBeat;  // 1..2000
+    uint8_t measuresPerBar;
+    uint8_t beatsPerMeasure;
+    uint32_t loopStart;  // in beats
+    uint32_t loopEnd;
 } PACKED header;
 #pragma pack(pop)
 
 struct Note
 {
-    U32 start;
-    U8 len;
-    U8 key;  // 0(C-0)..96(B-7)
-    U8 vol;  // 0..255
-    U8 pan;  // 0..12
+    uint32_t start;
+    uint8_t len;
+    uint8_t key;  // 0(C-0)..96(B-7)
+    uint8_t vol;  // 0..255
+    uint8_t pan;  // 0..12
 } *note[16];
 
 
@@ -69,30 +62,30 @@ struct Note
 #pragma pack(push,1)
 struct Instrument
 {
-    U16 freqShift;
-    U8 sample;  // melody(voice 0..7) 0-99, drums(voice 8..15) 0-11
-    U8 noLoop;
-    U16 notes;
+    uint16_t freqShift;
+    uint8_t sample;  // melody(voice 0..7) 0-99, drums(voice 8..15) 0-11
+    uint8_t noLoop;
+    uint16_t notes;
 
-    U8 drum;
-    U8 instrument;
-    S8 finetune;
+    uint8_t drum;
+    uint8_t instrument;
+    int8_t finetune;
 
-    S8 lastPan;  // encoding state
-    U8 lastVol;
-    U8 played;
+    int8_t lastPan;  // encoding state
+    uint8_t lastVol;
+    uint8_t played;
 } PACKED t[16];
 #pragma pack(pop)
 
 struct Track
 {
     float freq;  // if (freq != 0), a new note starts
-    U8 vol;      // 1..64; if (volume == 0), the note ends
-    S8 pan;      // -127=left..127=right
+    uint8_t vol;      // 1..64; if (volume == 0), the note ends
+    int8_t pan;      // -127=left..127=right
 } *n[16];
 
 
-U8 *pat[256], patTable[256]; int patLen[256]; int patterns;
+uint8_t *pat[256], patTable[256]; int patLen[256]; int patterns;
 
 int instruments;    // number of used instruments
 int tracks;         // number of tracks
@@ -108,21 +101,21 @@ int verorg;         //version of loaded song
 #pragma pack(push,1)
 struct XMHeader
 {
-    U8 id[17];
-    U8 moduleName[20];
-    U8 eof;
-    U8 trackerName[20];
-    U16 version;
-    U32 headerSize;
-    U16 songLength;  // in patterns
-    U16 restartPosition;
-    U16 channels;  // should be even, but we don't care ;)
-    U16 patterns;
-    U16 instruments;
-    U16 flags;
-    U16 tempo;
-    U16 bpm;
-    U8 patternOrder[256];
+    uint8_t id[17];
+    uint8_t moduleName[20];
+    uint8_t eof;
+    uint8_t trackerName[20];
+    uint16_t version;
+    uint32_t headerSize;
+    uint16_t songLength;  // in patterns
+    uint16_t restartPosition;
+    uint16_t channels;  // should be even, but we don't care ;)
+    uint16_t patterns;
+    uint16_t instruments;
+    uint16_t flags;
+    uint16_t tempo;
+    uint16_t bpm;
+    uint8_t patternOrder[256];
 } PACKED xmh = {
     "Extended Module: ", "", 0x1A, "Org2XM by Rrrola    ", 0x104, 0x114
 };
@@ -130,22 +123,22 @@ struct XMHeader
 
 struct XMInstrument
 {
-    U32 size;
-    U8 instrumentName[22];
-    U8 zero;
-    U16 samples;
-    U32 sampleHeaderSize;
-    U8 misc[230];
-    U32 sampleLength;
-    U32 loopStart;
-    U32 loopLength;
-    U8 volume;
-    S8 finetune;
-    U8 type;
-    U8 panning;
-    U8 relativeKey;
-    U8 reserved;
-    U8 sampleName[22];
+    uint32_t size;
+    uint8_t instrumentName[22];
+    uint8_t zero;
+    uint16_t samples;
+    uint32_t sampleHeaderSize;
+    uint8_t misc[230];
+    uint32_t sampleLength;
+    uint32_t loopStart;
+    uint32_t loopLength;
+    uint8_t volume;
+    int8_t finetune;
+    uint8_t type;
+    uint8_t panning;
+    uint8_t relativeKey;
+    uint8_t reserved;
+    uint8_t sampleName[22];
 } PACKED smp = {
     0x107, "Melody-00", 0, 1, 0x28, {}, 256, 0, 256, VOL, 0, 1, 128, 48, 0, ""
 };
@@ -155,26 +148,26 @@ struct XMInstrument
 
 struct SoundBank
 {
-    U8 magic[6];
-    U8 verbank;
-    U8 verorg;
-    U8 snumMelo;
-    U8 snumDrum;
-    U16 lenMelo;
-    U32 *tblLenDrum;
+    uint8_t magic[6];
+    uint8_t verbank;
+    uint8_t verorg;
+    uint8_t snumMelo;
+    uint8_t snumDrum;
+    uint16_t lenMelo;
+    uint32_t *tblLenDrum;
     char (*tblNameDrum)[22];
-    S8 *melody;
-    S8 *drums;
+    int8_t *melody;
+    int8_t *drums;
 
-    U32 *tblOffDrum;
-    U32 lenAllDrm;
+    uint32_t *tblOffDrum;
+    uint32_t lenAllDrm;
 } sbank;
 
 int SBKload(char *path)
 {
     FILE *f;
-    U32 i, j;
-    U32 fSize;
+    uint32_t i, j;
+    uint32_t fSize;
     if (!(f = fopen(path, "rb"))) goto Err10;
 
     //file size, just in case
@@ -198,21 +191,21 @@ int SBKload(char *path)
     read(&sbank.snumDrum, 1);
 
     //length of each melody sample
-    U16 tmp = 0;
-    U16 x = 0;
+    uint16_t tmp = 0;
+    uint16_t x = 0;
     read(&x, 1); tmp = (tmp << 8) + x;
     read(&x, 1); tmp = (tmp << 8) + x;
     sbank.lenMelo = tmp;
 
     //drum sample length and offset tables
-    sbank.tblLenDrum = malloc(sbank.snumDrum * sizeof(U32));
-    sbank.tblOffDrum = malloc(sbank.snumDrum * sizeof(U32));
+    sbank.tblLenDrum = malloc(sbank.snumDrum * sizeof(uint32_t));
+    sbank.tblOffDrum = malloc(sbank.snumDrum * sizeof(uint32_t));
     sbank.lenAllDrm = 0;
-    U32 off = 0;
+    uint32_t off = 0;
     for(i = 0; i < sbank.snumDrum; i++)
     {
-        U32 tmp = 0;
-        U32 x = 0;
+        uint32_t tmp = 0;
+        uint32_t x = 0;
         read(&x, 1); tmp = (tmp << 8) + x;
         read(&x, 1); tmp = (tmp << 8) + x;
         read(&x, 1); tmp = (tmp << 8) + x;
@@ -244,7 +237,7 @@ int SBKload(char *path)
     read(sbank.drums, sbank.lenAllDrm * 1);
 
     //delta encode samples
-    S8 *buf;
+    int8_t *buf;
     //melody
     for (i = 0 ; i < sbank.snumMelo; i++)
     {
@@ -276,7 +269,7 @@ int SBKload(char *path)
 
 int key, finetune;
 
-U8 wKey, wInst, wVol, wFine, wPan, wPanVol, wSkip;
+uint8_t wKey, wInst, wVol, wFine, wPan, wPanVol, wSkip;
 
 void encode(int i, int j)
 {
@@ -510,7 +503,7 @@ int main(int argc, char** argv)
 
     for (i=0; i<tracks; ++i)
     {
-        double bestE=1e30; U8 bestFinetune;
+        double bestE=1e30; uint8_t bestFinetune;
 
         for (k=-64; k<64; k++)  // try every possible finetune
         {
@@ -567,17 +560,17 @@ int main(int argc, char** argv)
     for (k=0; k<bars; ++k)
     {
         int len;
-        U8 *buf = pat[k] = malloc(5*barLen*tracks+9);
+        uint8_t *buf = pat[k] = malloc(5*barLen*tracks+9);
         memset(buf, 0, 5*barLen*tracks+9);
 
-        *(U32*)&buf[0] = len = 9;
-        *(U16*)&buf[5] = barLen;
+        *(uint32_t*)&buf[0] = len = 9;
+        *(uint16_t*)&buf[5] = barLen;
 
         for (j=k*barLen; j<(k+1)*barLen; ++j) for (i=0; i<tracks; ++i)
         {
             encode(i, j);
 
-            U8 p = 0x80 | wKey | wInst*2 | (wVol||wPanVol)*4 | (wPan||wSkip||wFine)*24;
+            uint8_t p = 0x80 | wKey | wInst*2 | (wVol||wPanVol)*4 | (wPan||wSkip||wFine)*24;
             if (p != 0x9F) buf[len++] = p;
 
             // key column
@@ -606,7 +599,7 @@ int main(int argc, char** argv)
             }
         }
 
-        *(U16*)&buf[7] = len-9;
+        *(uint16_t*)&buf[7] = len-9;
         patLen[k] = len;
     }
 
@@ -659,7 +652,7 @@ int main(int argc, char** argv)
 
     for (k=1, i=0; i<tracks; ++i) if (t[i].instrument == k)
     {
-        S8 *sbuf;
+        int8_t *sbuf;
 
         sprintf(smp.sampleName, "samples/%03d.wav", t[i].sample);
 
@@ -670,7 +663,7 @@ int main(int argc, char** argv)
         memset(smp.instrumentName, 0, 22);
         if (t[i].drum)
         {
-            U8 dsmp = t[i].sample - 100;
+            uint8_t dsmp = t[i].sample - 100;
             sbuf = &sbank.drums[sbank.tblOffDrum[dsmp]];
 
             smp.type = 0;
