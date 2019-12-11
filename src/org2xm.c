@@ -169,10 +169,7 @@ int SBKload(char *path)
     FILE *f;
     uint32_t i, j;
     uint32_t fSize;
-    if (!(f = fopen(path, "rb"))) {
-	    //Opens ORG210EN.DAT if no argument provided
-	    f = fopen("ORG210EN.DAT", "rb");
-    }
+    if (!(f = fopen(path, "rb"))) goto Err10;
 
     //file size, just in case
     fseek(f , 0 , SEEK_END);
@@ -367,15 +364,10 @@ int main(int argc, char** argv)
     if (argc > 3) compatibility = 1;
 
     //Read bank file
-    int ret = SBKload(argv[2]);
+    int ret = SBKload(argc < 3 ? "ORG210EN.DAT" : argv[2]);
     if (ret) return ret;
 
-    if (!(f = fopen(argv[1], "rb"))) {
-	    //goto Err2;
-	    //give default string
-	    f = fopen("ORGEN210.DAT", "rb");
-    }
-
+    if (!(f = fopen(argv[1], "rb"))) goto Err2;
 
 
     // Read the Org file
