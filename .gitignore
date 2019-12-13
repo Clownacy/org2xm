@@ -1,6 +1,9 @@
 /obj/
+/org/
 /*.xm
 /*.org
 /*.bat
 *.depend
 *.layout
+org2xm
+org2xm.exe

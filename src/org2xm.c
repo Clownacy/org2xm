@@ -443,7 +443,7 @@ int main(int argc, char** argv)
             int vol = note[i][j].vol;
             int pan = note[i][j].pan;
 
-            vol = (vol==0xff ? VOL : 1+vol/4);
+            vol = (vol==0xff ? VOL : (vol/255.)*56.5+8.499); //org minimum volume adjustment
             pan = (pan==0xff ? 0 : (pan-6)*127/6);
 
             // "new note" or "change note parameters"?
